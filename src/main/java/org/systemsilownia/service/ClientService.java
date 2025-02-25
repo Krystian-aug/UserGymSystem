@@ -1,12 +1,12 @@
 package org.systemsilownia.service;
 
-import org.systemsilownia.repository.ClientRepository;
+import org.systemsilownia.repository.ClientLoginMenuRepository;
 import org.systemsilownia.repository.entity.Client;
 
 public class ClientService {
-    private final ClientRepository clientRepository;
+    private final ClientLoginMenuRepository clientRepository;
 
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientLoginMenuRepository clientRepository) {
         this.clientRepository = clientRepository;
     }
     public boolean save(Client client) {return clientRepository.save(client);}

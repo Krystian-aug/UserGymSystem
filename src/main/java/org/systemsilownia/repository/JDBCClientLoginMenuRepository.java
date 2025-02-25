@@ -4,7 +4,7 @@ import org.systemsilownia.repository.entity.Client;
 
 import java.sql.*;
 
-public class JDBCClientRepository implements ClientRepository {
+public class JDBCClientLoginMenuRepository implements ClientLoginMenuRepository {
 
     public static final String USER = "postgres";
     public static final String PASSWORD = "peviwo08";
