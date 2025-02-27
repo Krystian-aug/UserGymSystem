@@ -39,6 +39,15 @@ public class Client {
         this.password = password;
     }
 
+    public Client(Long id, String name, String surname, String email, double amount, String password) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.amount = amount;
+        this.password = password;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

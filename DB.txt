@@ -1,0 +1,39 @@
+DROP TABLE membership CASCADE;
+DROP TABLE users CASCADE ;
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    surname VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,}$'),
+    amount NUMERIC(10,2) DEFAULT 0 CHECK (amount >= 0),
+    password TEXT NOT NULL CHECK (LENGTH(password) >= 8)
+);
+
+CREATE TABLE membership (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER UNIQUE NOT NULL,
+    membership_duration DATE NOT NULL DEFAULT CURRENT_DATE,
+    price NUMERIC(10,2) CHECK (price >= 0) NOT NULL,
+    discount BOOLEAN DEFAULT FALSE,
+
+    CONSTRAINT fk_user
+            FOREIGN KEY (user_id) REFERENCES users(id)
+            ON DELETE CASCADE
+);
+
+INSERT INTO users (name, surname, email, amount, password)
+VALUES
+    ('Jan', 'Kowalski', 'jan.kowalski@example.com', 150.00, 'haslo123'),
+    ('Anna', 'Nowak', 'anna.nowak@example.com', 200.00, 'bezpiecznehaslo'),
+    ('Piotr', 'Wiśniewski', 'piotr.wisniewski@example.com', 300.00, 'tajnehaslo');
+
+INSERT INTO membership (user_id, membership_duration, price, discount)
+VALUES
+    (1, '2025-06-30', 199.99, TRUE),
+    (2, '2025-07-15', 249.99, FALSE),
+    (3, '2025-08-01', 179.99, TRUE);
+
+SELECT name, surname, price FROM users u INNER JOIN membership m on u.id = m.user_id;
+SELECT price, email FROM membership m INNER JOIN users u on m.user_id = u.id;
+SELECT * FROM users;

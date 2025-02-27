@@ -3,6 +3,7 @@ package org.systemsilownia.repository;
 import org.systemsilownia.repository.entity.Client;
 
 public interface ClientLoginMenuRepository {
-    boolean save(Client client);
+    Client save(Client client);
     Client findByEmail(String email);
+    boolean checkMembershipExistsById(Long id);
 }

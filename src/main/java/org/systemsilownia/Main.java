@@ -19,28 +19,45 @@ public class Main {
     private void runClient() {
         final ClientLoginMenuRepository repository = new JDBCClientLoginMenuRepository();
         service = new ClientService(repository);
-
+        Client client = null;
+        boolean running = true;
         try(Scanner scanner = new Scanner(System.in)) {
-            boolean succesfull;
-            do{
+            while (running) {
                 System.out.println("1 - Login");
                 System.out.println("2 - Register");
                 System.out.println("3 - Exit");
                 final String next = scanner.next();
-                succesfull = switch (next) {
-                    case "1" -> login(scanner);
-                    case "2" -> register(scanner);
-                    default -> true;
-                }; //Ulepszony switch case
-            }while(!succesfull);
+                if(next.equals("1")) {
+                    client = login(scanner);
+                    if(client == null) {
+                        System.out.println("Nie pomyślne logowanie użytkownika, spróbuj ponownie.");
+                    }
+                    else{
+                        startApp(client, scanner);
+                        running = false;
+                    }
+                }
+                else if(next.equals("2")) {
+                    client = register(scanner);
+                    if (client == null) {
+                        System.out.println("Nie udało się zarejestrować użytkownika, spróbuj ponownie.");
+                    } else {
+                        startApp(client, scanner);
+                        running = false;
+                    }
+                }
+                else {break;}
+            }
             //Sprawdzenie czy user ma karnet, jeżeli nie to odrazu metoda stworzenia karnetu
             //Jeżeli ma to go do apki
-            startApp(scanner);
         }
     }
 
-    private void startApp(Scanner scanner) {
+    private void startApp(Client client, Scanner scanner) {
+        final ClientAppMenuRepository repository = new HibernateClientAppMenuRepository();
+        service = new ClientService(repository); //Dodać repozytorium hibernate do obslugi apki
         System.out.println("Welcome to GymSystem application");
+        checkMembershipExistence(client);
         boolean running = true;
 
         while(running) {
@@ -67,16 +84,23 @@ public class Main {
         }
     }
 
-    private boolean login(Scanner scanner) {
+    private void checkMembershipExistence(Client client) {
+        boolean existance = service.checkMembership(client);
+        if(!existance) {
+            //dodaj membershipa - napisać metodę dodającą membershipa
+        }
+    }
+
+    private Client login(Scanner scanner) {
         System.out.println("Please enter your email: ");
         final String fromEmail = scanner.next();
         System.out.println("Please enter your password: ");
         final String fromPassword = scanner.next();
-        boolean correct;
+        Client correct;
         correct = service.login(fromEmail, fromPassword);
-        return correct; //jeżeli logowanie nie powiodłow się, czyli false to pętla logowania się ponawia, jeżeli true to przechodzi do aplikacji
+        return correct;
     }
-    private boolean register(Scanner scanner) {
+    private Client register(Scanner scanner) {
         System.out.println("Please enter your first name: ");
         final String fromFirstName = scanner.next();
         System.out.println("Please enter your last name: ");
@@ -86,8 +110,7 @@ public class Main {
         System.out.println("Please enter your password: ");
         final String fromPassword = scanner.next();
         Client fromClient = new Client(fromFirstName, fromLastName, fromEmail, fromPassword);
-        boolean correct = service.register(fromClient);
-        return correct; //jeżeli pomyślnie dodano nowe konto klienta do bazy to przechodzi do apki, jeżeli nie to ponawia pętle logowania
+        return service.register(fromClient);
     }
 
 }
